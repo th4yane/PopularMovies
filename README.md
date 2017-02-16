@@ -26,3 +26,7 @@ compile 'com.android.support:recyclerview-v7:25.0.1'
 ```
 
 ##ScreenShots
+
+![alt tag](https://cloud.githubusercontent.com/assets/14139700/23031994/c4029002-f451-11e6-8b7d-2f07d8cd9367.png)
+
+![alt tag](https://cloud.githubusercontent.com/assets/14139700/23031983/bdbd793c-f451-11e6-851f-4a11e3cd6bc5.png)
