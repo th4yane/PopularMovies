@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private TextView errorMessageTextView;
     private GridLayoutManager layoutManager;
     private String API_KEY;
+    private Context context;
 
 
     @Override
@@ -36,7 +37,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        API_KEY = this.getString(R.string.MOVIEDB_API_KEY);
+        context = this;
+        API_KEY = context.getString(R.string.MOVIEDB_API_KEY);
 
         moviesRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_movies);
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            error = "An error has occurred";
+            error = context.getString(R.string.error_message);
             mProgressBar.setVisibility(View.VISIBLE);
             errorMessageTextView.setVisibility(View.INVISIBLE);
         }
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 return null;
             }
             if(!isOnline()){
-                error = "No internet connection.";
+                error = context.getString(R.string.error_connection);
             }
 
             URL movieUrl = params[0];

@@ -81,7 +81,7 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            error = "An error has occurred.";
+            error = context.getString(R.string.error_message);
             mLinearLayoutOverview.setVisibility(View.INVISIBLE);
             mLinearLayoutInfo.setVisibility(View.INVISIBLE);
             errorMessageTextView.setVisibility(View.INVISIBLE);
@@ -95,7 +95,7 @@ public class DetailActivity extends AppCompatActivity {
             }
 
             if(!isOnline()){
-                error = "No internet connection.";
+                error = context.getString(R.string.error_connection);
             }
 
             URL movieUrl = params[0];
