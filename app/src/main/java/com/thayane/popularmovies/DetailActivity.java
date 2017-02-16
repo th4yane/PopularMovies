@@ -15,8 +15,6 @@ import com.squareup.picasso.Picasso;
 import com.thayane.popularmovies.utilities.MovieDbJsonUtils;
 import com.thayane.popularmovies.utilities.NetworkUtils;
 
-import org.w3c.dom.Text;
-
 import java.net.URL;
 
 public class DetailActivity extends AppCompatActivity {
@@ -136,12 +134,13 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
 
+        /*Code created with the help of a Stack OverFlow question:
+        http://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
+        */
         public boolean isOnline() {
-            ConnectivityManager cm =
-                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            return cm.getActiveNetworkInfo() != null &&
-                    cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
         }
 
     }
