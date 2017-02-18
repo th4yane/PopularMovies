@@ -3,11 +3,11 @@ package com.thayane.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,12 +20,16 @@ import com.thayane.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private RecyclerView moviesRecyclerView;
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler,MovieTaskInterface{
+
+    @BindView(R.id.recyclerview_movies) RecyclerView moviesRecyclerView;
+    @BindView(R.id.pb_loading_movies) ProgressBar mProgressBar;
+    @BindView(R.id.tv_error_message) TextView errorMessageTextView;
+
     private static MoviesAdapter mMovieAdapter;
-    private ProgressBar mProgressBar;
-    private TextView errorMessageTextView;
     private GridLayoutManager layoutManager;
     private String API_KEY;
     private Context context;
@@ -35,22 +39,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         context = this;
         API_KEY = context.getString(R.string.MOVIEDB_API_KEY);
 
-        moviesRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
-        mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_movies);
-
-        errorMessageTextView = (TextView) findViewById(R.id.tv_error_message);
-
-        layoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL,false);
-
-
-        //check screen orientation
-        if (getResources().getConfiguration().orientation == getResources().getConfiguration().ORIENTATION_LANDSCAPE){
-            layoutManager.setSpanCount(5);
-        }
+        layoutManager = new GridLayoutManager(this, calculateNoOfColumns(this), GridLayoutManager.VERTICAL,false);
 
         if(mMovieAdapter == null){
             mMovieAdapter = new MoviesAdapter(this, this);
@@ -59,6 +53,15 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         moviesRecyclerView.setAdapter(mMovieAdapter);
         moviesRecyclerView.setLayoutManager(layoutManager);
 
+    }
+
+    /*Code created with help of a Stack Overflow question:
+    http://stackoverflow.com/questions/33575731/gridlayoutmanager-how-to-auto-fit-columns */
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / 120);
+        return noOfColumns;
     }
 
     @Override
@@ -91,73 +94,51 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
     public void topRatedMovies(){
-        URL movieUrl = NetworkUtils.buildTopRatedUrl(API_KEY);
-        new MovieTask().execute(movieUrl);
+        //Checking if there is internet connection
+        if(!isOnline()){
+            errorMessageTextView.setText(context.getString(R.string.error_connection));
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        } else {
+            errorMessageTextView.setVisibility(View.INVISIBLE);
+            URL movieUrl = NetworkUtils.buildTopRatedUrl(API_KEY);
+            new MovieTask(this).execute(movieUrl);
+        }
     }
 
     public void popularMovies(){
-        URL movieUrl = NetworkUtils.buildPopularUrl(API_KEY);
-        new MovieTask().execute(movieUrl);
+        //Checking if there is internet connection
+        if(!isOnline()){
+            errorMessageTextView.setText(context.getString(R.string.error_connection));
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        } else{
+            errorMessageTextView.setVisibility(View.INVISIBLE);
+            URL movieUrl = NetworkUtils.buildPopularUrl(API_KEY);
+            new MovieTask(this).execute(movieUrl);
+        }
     }
 
-
-    public class MovieTask extends AsyncTask<URL, Void, MovieData[]> {
-
-        String error;
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            error = context.getString(R.string.error_message);
-            mProgressBar.setVisibility(View.VISIBLE);
-            errorMessageTextView.setVisibility(View.INVISIBLE);
-        }
-
-        @Override
-        protected MovieData[] doInBackground(URL... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-            if(!isOnline()){
-                error = context.getString(R.string.error_connection);
-            }
-
-            URL movieUrl = params[0];
-
-            try {
-                String jsonMovieResponse = NetworkUtils
-                        .getResponseFromHttpUrl(movieUrl);
-
-                MovieData[] simpleJsonMovieData = MovieDbJsonUtils
-                        .getMoviesDataFromJson(jsonMovieResponse);
-
-                return simpleJsonMovieData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(MovieData[] moviesResults) {
-            mProgressBar.setVisibility(View.INVISIBLE);
-            if (moviesResults != null) {
-                mMovieAdapter.setMoviesData(moviesResults);
-            } else{
-                errorMessageTextView.setText(error);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-
-        }
-
-        /*Code created with the help of a Stack OverFlow question:
+    /*Code created with the help of a Stack OverFlow question:
         http://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
         */
-        public boolean isOnline() {
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
 
-            return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    @Override
+    public void onPreExecuteAsyncTask() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        errorMessageTextView.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onPostExecuteAsyncTask(MovieData[] moviesResults) {
+        mProgressBar.setVisibility(View.INVISIBLE);
+        if (moviesResults != null) {
+            mMovieAdapter.setMoviesData(moviesResults);
+        } else{
+            errorMessageTextView.setText(context.getString(R.string.error_message));
+            errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
 }

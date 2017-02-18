@@ -56,9 +56,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         String posterPath = mMoviesData[position].imagePath;
         String id = mMoviesData[position].id;
 
-        String imageUrl = setImageUrl(posterPath, "w500"); //build url
+        String imageUrl = setImageUrl(posterPath); //build url
 
-        Picasso.with(mContext).load(imageUrl).into(holder.mMoviePosterImageView); //load image into imageview
+        //Load image into a ImageView
+        Picasso.with(mContext)
+                .load(imageUrl)
+                .placeholder(R.drawable.image)
+                .error(R.drawable.image_error)
+                .into(holder.mMoviePosterImageView);
+
         holder.mMoviePosterImageView.setTag(id); //set tag with the id of the movie, to use later
     }
 
@@ -68,9 +74,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     }
 
     /* This method builds the url of the image */
-    public String setImageUrl (String posterPath, String size){
+    private String setImageUrl (String posterPath){
         String imageUrl = "http://image.tmdb.org/t/p/";
-        imageUrl += size + posterPath;
+        imageUrl += "w500" + posterPath;
         return imageUrl;
     }
 

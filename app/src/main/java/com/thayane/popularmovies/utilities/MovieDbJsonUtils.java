@@ -23,7 +23,7 @@ public class MovieDbJsonUtils {
         final String MDB_ID = "id";
 
         /* String array to hold each movie's data */
-        MovieData[] parsedMovieData = null;
+        MovieData[] parsedMovieData;
 
         JSONObject moviesJson = new JSONObject(moviesJsonStr);
 
