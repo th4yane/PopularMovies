@@ -28,7 +28,6 @@ compile 'com.jakewharton:butterknife:8.5.1'
 annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
 ```
-
 ##ScreenShots
 
 <img src="https://cloud.githubusercontent.com/assets/14139700/23031994/c4029002-f451-11e6-8b7d-2f07d8cd9367.png" width="500">
