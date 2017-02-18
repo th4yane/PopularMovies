@@ -1,4 +1,4 @@
-# Popular_Movies
+# PopularMovies
 Android application which shows information about movies. It uses the api provided by the [themoviedb](https://api.themoviedb.org/). Movies can be seen by **Most Popular** and **Top Rated**.
 
 ## How to use this application?
@@ -13,9 +13,10 @@ Create and put xml file "api_keys.xml" in the directory "res/values/".
 </resources>
 ```
 
-##Library Used
+##Libraries Used
 
 - [Picasso](http://square.github.io/picasso/)
+- [Butter Knife](http://jakewharton.github.io/butterknife/)
 
 ###Dependencies Used
 
@@ -23,8 +24,10 @@ Create and put xml file "api_keys.xml" in the directory "res/values/".
 compile 'com.android.support:appcompat-v7:25.1.1'
 compile 'com.squareup.picasso:picasso:2.5.2'
 compile 'com.android.support:recyclerview-v7:25.0.1'
-```
+compile 'com.jakewharton:butterknife:8.5.1'
+annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
+```
 ##ScreenShots
 
 <img src="https://cloud.githubusercontent.com/assets/14139700/23031994/c4029002-f451-11e6-8b7d-2f07d8cd9367.png" width="500">
