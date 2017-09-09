@@ -1,6 +1,7 @@
 package com.thayane.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     private MovieData[] mMoviesData;
     private Context mContext;
 
-    final private MoviesAdapterOnClickHandler mClickHandler;
+    private static MoviesAdapterOnClickHandler mClickHandler=null;
 
 
     interface MoviesAdapterOnClickHandler{
@@ -80,7 +81,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         return imageUrl;
     }
 
-    public class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView mMoviePosterImageView;
         public String movieId;
 

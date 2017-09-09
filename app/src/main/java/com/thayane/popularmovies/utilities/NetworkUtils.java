@@ -2,6 +2,8 @@ package com.thayane.popularmovies.utilities;
 
 import android.net.Uri;
 
+import com.thayane.popularmovies.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -66,6 +68,19 @@ public class NetworkUtils  {
         return url;
     }
 
+    public static URL buildMovieTrailerUrl(String trailerUrl) {
+        Uri builtUri = Uri.parse(trailerUrl).buildUpon()
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

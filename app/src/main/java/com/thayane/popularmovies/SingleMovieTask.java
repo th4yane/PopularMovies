@@ -32,13 +32,22 @@ public class SingleMovieTask extends AsyncTask<URL, Void, MovieData>{
         }
 
         URL movieUrl = params[0];
+        URL movieTrailerUrl = params[1];
+        URL movieReviewsUrl = params[2];
 
         try {
             String jsonMovieResponse = NetworkUtils
                     .getResponseFromHttpUrl(movieUrl);
 
+            String jsonMovieTrailerResponse = NetworkUtils
+                    .getResponseFromHttpUrl(movieTrailerUrl);
+
+            String jsonMovieReviewsResponse = NetworkUtils
+                    .getResponseFromHttpUrl(movieReviewsUrl);
+
             MovieData simpleJsonMovieData = MovieDbJsonUtils
-                    .getSingleMovieDataFromJson(jsonMovieResponse);
+                    .getSingleMovieDataFromJson(jsonMovieResponse, jsonMovieTrailerResponse,
+                            jsonMovieReviewsResponse);
 
             return simpleJsonMovieData;
 

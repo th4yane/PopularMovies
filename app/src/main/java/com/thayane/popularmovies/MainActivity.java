@@ -2,7 +2,10 @@ package com.thayane.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,8 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.thayane.popularmovies.utilities.MovieDbJsonUtils;
+import com.thayane.popularmovies.data.MoviesContract;
 import com.thayane.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
@@ -23,64 +27,114 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler,MovieTaskInterface{
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler, MovieTaskInterface {
 
-    @BindView(R.id.recyclerview_movies) RecyclerView moviesRecyclerView;
-    @BindView(R.id.pb_loading_movies) ProgressBar mProgressBar;
-    @BindView(R.id.tv_error_message) TextView errorMessageTextView;
+    @BindView(R.id.recyclerview_movies)
+    RecyclerView moviesRecyclerView;
+    @BindView(R.id.pb_loading_movies)
+    ProgressBar mProgressBar;
+    @BindView(R.id.tv_error_message)
+    TextView errorMessageTextView;
 
     private static MoviesAdapter mMovieAdapter;
+    private static MovieCursorAdapter mMovieDataAdapter;
     private GridLayoutManager layoutManager;
     private String API_KEY;
     private Context context;
+    private boolean mTwoPane;
+    private static final String DETAILACTIVITY_TAG = "DATAG";
+    private static Bundle bd;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;
+        } else {
+            mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
+        }
+/*
+        DetailFragment detailFragment =  ((DetailFragment)getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_detail));
+        forecastFragment.setUseTodayLayout(!mTwoPane);
+        */
         ButterKnife.bind(this);
 
         context = this;
         API_KEY = context.getString(R.string.MOVIEDB_API_KEY);
 
-        layoutManager = new GridLayoutManager(this, calculateNoOfColumns(this), GridLayoutManager.VERTICAL,false);
+        layoutManager = new GridLayoutManager(this, calculateNoOfColumns(this), GridLayoutManager.VERTICAL, false);
 
-        if(mMovieAdapter == null){
-            mMovieAdapter = new MoviesAdapter(this, this);
-            popularMovies(); //default sort by popular movies
+        if (mMovieAdapter == null) {
+            if (mMovieDataAdapter != null) {
+                moviesRecyclerView.setAdapter(mMovieDataAdapter);
+            } else {
+                popularMovies(); //default sort by popular movies
+            }
+        } else {
+            moviesRecyclerView.setAdapter(mMovieAdapter);
         }
-        moviesRecyclerView.setAdapter(mMovieAdapter);
-        moviesRecyclerView.setLayoutManager(layoutManager);
 
+        moviesRecyclerView.setLayoutManager(layoutManager);
+        bd = savedInstanceState;
+
+        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void clickHandler(String id) {
+
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            args.putString(DetailFragment.DETAIL_ID, id);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment, DETAILACTIVITY_TAG)
+                    .commit();
+
+        } else {
+            Intent intentToStartDetailActivity = new Intent(this, DetailActivity.class);
+            intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, id);
+            startActivity(intentToStartDetailActivity);
+        }
+    }
+
 
     /*Code created with help of a Stack Overflow question:
     http://stackoverflow.com/questions/33575731/gridlayoutmanager-how-to-auto-fit-columns */
-    public static int calculateNoOfColumns(Context context) {
+    public int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        if (mTwoPane) {
+            dpWidth = dpWidth - ((dpWidth + 100) / 2);
+        }
         int noOfColumns = (int) (dpWidth / 120);
         return noOfColumns;
     }
 
     @Override
-    public void clickHandler(String id) {
-        Intent intentToStartDetailActivity = new Intent(this, DetailActivity.class);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, id);
-        startActivity(intentToStartDetailActivity);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_most_popular:
-                mMovieAdapter.setMoviesData(null);
+                mMovieAdapter = null;
+                mMovieDataAdapter = null;
                 popularMovies();
                 return true;
             case R.id.action_top_rated:
-                mMovieAdapter.setMoviesData(null);
+                mMovieAdapter = null;
+                mMovieDataAdapter = null;
                 topRatedMovies();
+                return true;
+            case R.id.action_favorites:
+                mMovieAdapter = null;
+                favoriteMovies();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -93,9 +147,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         return true;
     }
 
-    public void topRatedMovies(){
+    public void topRatedMovies() {
         //Checking if there is internet connection
-        if(!isOnline()){
+        if (!isOnline()) {
             errorMessageTextView.setText(context.getString(R.string.error_connection));
             errorMessageTextView.setVisibility(View.VISIBLE);
         } else {
@@ -105,16 +159,27 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         }
     }
 
-    public void popularMovies(){
+    public void popularMovies() {
         //Checking if there is internet connection
-        if(!isOnline()){
+        if (!isOnline()) {
             errorMessageTextView.setText(context.getString(R.string.error_connection));
             errorMessageTextView.setVisibility(View.VISIBLE);
-        } else{
+        } else {
             errorMessageTextView.setVisibility(View.INVISIBLE);
             URL movieUrl = NetworkUtils.buildPopularUrl(API_KEY);
             new MovieTask(this).execute(movieUrl);
         }
+    }
+
+    public void favoriteMovies() {
+        errorMessageTextView.setVisibility(View.INVISIBLE);
+        Cursor c = this.getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+        mMovieDataAdapter = new MovieCursorAdapter(this, c);
+        moviesRecyclerView.setAdapter(mMovieDataAdapter);
     }
 
     /*Code created with the help of a Stack OverFlow question:
@@ -135,8 +200,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     public void onPostExecuteAsyncTask(MovieData[] moviesResults) {
         mProgressBar.setVisibility(View.INVISIBLE);
         if (moviesResults != null) {
+            mMovieAdapter = new MoviesAdapter(this, this);
             mMovieAdapter.setMoviesData(moviesResults);
-        } else{
+            moviesRecyclerView.setAdapter(mMovieAdapter);
+        } else {
             errorMessageTextView.setText(context.getString(R.string.error_message));
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
