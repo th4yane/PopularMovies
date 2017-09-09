@@ -30,9 +30,9 @@ annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 ```
 ##ScreenShots
 
-<img src="https://user-images.githubusercontent.com/14139700/30244152-bb4b314c-958e-11e7-9e22-0e50ed358504.jpg" width="500">
-
 <img src="https://user-images.githubusercontent.com/14139700/30244153-bb500f50-958e-11e7-8e6c-22926d339e46.jpg" width="500">
 
-Tablet's layout:
+<img src="https://user-images.githubusercontent.com/14139700/30244152-bb4b314c-958e-11e7-9e22-0e50ed358504.jpg" width="500">
+
+Tablet's layout: </br>
 <img src="https://user-images.githubusercontent.com/14139700/30244161-f4940582-958e-11e7-9215-f4e75ef16c0f.png" width="500">
