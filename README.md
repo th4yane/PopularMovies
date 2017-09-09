@@ -1,5 +1,5 @@
 # PopularMovies
-Android application which shows information about movies. It uses the api provided by the [themoviedb](https://api.themoviedb.org/). Movies can be seen by **Most Popular** and **Top Rated**.
+Android application which shows information about movies. It uses the api provided by the [themoviedb](https://api.themoviedb.org/). Movies can be seen by **Most Popular**, **Top Rated** and **Favorites**.
 
 ## How to use this application?
 For running this application you have to keep your api key provided by the themoviedb in a XML file.
