@@ -1,5 +1,5 @@
 # PopularMovies
-Android application which shows information about movies. It uses the api provided by the [themoviedb](https://api.themoviedb.org/). Movies can be seen by **Most Popular** and **Top Rated**.
+Android application which shows information about movies. It uses the api provided by the [themoviedb](https://api.themoviedb.org/). Movies can be seen by **Most Popular**, **Top Rated** and **Favorites**.
 
 ## How to use this application?
 For running this application you have to keep your api key provided by the themoviedb in a XML file.
@@ -30,6 +30,9 @@ annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 ```
 ##ScreenShots
 
-<img src="https://cloud.githubusercontent.com/assets/14139700/23031994/c4029002-f451-11e6-8b7d-2f07d8cd9367.png" width="500">
+<img src="https://user-images.githubusercontent.com/14139700/30244153-bb500f50-958e-11e7-8e6c-22926d339e46.jpg" width="500">
 
-<img src="https://cloud.githubusercontent.com/assets/14139700/23031983/bdbd793c-f451-11e6-851f-4a11e3cd6bc5.png" width="500">
+<img src="https://user-images.githubusercontent.com/14139700/30244152-bb4b314c-958e-11e7-9e22-0e50ed358504.jpg" width="500">
+
+Tablet's layout: </br>
+<img src="https://user-images.githubusercontent.com/14139700/30244161-f4940582-958e-11e7-9215-f4e75ef16c0f.png" width="500">
