@@ -38,17 +38,6 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         holder.trailerKey = videoPath;
         holder.mTrailerImageView.setImageResource(R.drawable.play);
         holder.mKeyTextView.setText(mContext.getString(R.string.trailer)+" "+ (position+1));
-
-        /*String imageUrl = setImageUrl(posterPath); //build url
-
-        //Load image into a ImageView
-        Picasso.with(mContext)
-                .load(imageUrl)
-                .placeholder(R.drawable.image)
-                .error(R.drawable.image_error)
-                .into(holder.mMoviePosterImageView);*/
-
-        //holder.mMoviePosterImageView.setTag(id); //set tag with the id of the movie, to use later
     }
 
     @Override

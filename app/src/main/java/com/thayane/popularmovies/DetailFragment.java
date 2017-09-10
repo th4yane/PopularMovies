@@ -8,15 +8,21 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -64,10 +70,13 @@ public class DetailFragment extends Fragment implements SingleMovieTaskInterface
     @BindView(R.id.mark_favorite_btn)
     Button markFavoriteButton;
 
+    @BindView(R.id.activity_detail)
+    ScrollView mScrollView;
+
     private Context context;
     private String API_KEY;
-    private static TrailersAdapter mTrailersAdapter;
-    private static ReviewsAdapter mReviewsAdapter;
+    private TrailersAdapter mTrailersAdapter;
+    private ReviewsAdapter mReviewsAdapter;
     private LinearLayoutManager layoutManager;
     private String id, imagePath;
     private static boolean favorite;
@@ -85,6 +94,8 @@ public class DetailFragment extends Fragment implements SingleMovieTaskInterface
         }
         return view;
     }
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -109,6 +120,16 @@ public class DetailFragment extends Fragment implements SingleMovieTaskInterface
         if (!isOnline()) {
             errorMessageTextView.setText(R.string.error_connection);
             errorMessageTextView.setVisibility(View.VISIBLE);
+            Snackbar snackbar = Snackbar.make(mScrollView, getString(R.string.error_connection), Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(getString(R.string.retry_connection), new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intentToStartDetailActivity = new Intent(context, DetailActivity.class);
+                    intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, id);
+                    startActivity(intentToStartDetailActivity);
+                }
+            });
+            snackbar.show();
         } else {
             errorMessageTextView.setVisibility(View.INVISIBLE);
             URL[] movieUrl = {NetworkUtils.buildMovieUrl(url), NetworkUtils.buildMovieTrailerUrl(trailerUrl),
@@ -116,12 +137,11 @@ public class DetailFragment extends Fragment implements SingleMovieTaskInterface
             new SingleMovieTask(this).execute(movieUrl);
         }
 
-        layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, true);
         trailersRecyclerView.setAdapter(mTrailersAdapter);
-        trailersRecyclerView.setLayoutManager(layoutManager);
+        trailersRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
         reviewsRecyclerView.setAdapter(mReviewsAdapter);
-        reviewsRecyclerView.setLayoutManager( new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, true));
+        reviewsRecyclerView.setLayoutManager( new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true));
 
         favorite = checkIfFavorite();
         if(favorite){
@@ -153,6 +173,9 @@ public class DetailFragment extends Fragment implements SingleMovieTaskInterface
                 && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
+    public void showSnackBar(){
+
+    }
 
 
     public boolean checkIfFavorite(){

@@ -107,8 +107,6 @@ public class MoviesProvider extends ContentProvider {
                 // insert unless it is already contained in the database
                 if (_id > 0) {
                     returnUri = MoviesContract.MovieEntry.buildFavoritesUri(_id);
-                    Toast.makeText(getContext(), "YAY",
-                            Toast.LENGTH_LONG).show();
                 } else {
                     throw new android.database.SQLException("Failed to insert row into: " + uri);
                 }

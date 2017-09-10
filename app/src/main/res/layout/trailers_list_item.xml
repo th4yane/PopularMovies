@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,13 +13,14 @@
             android:layout_height="wrap_content"
             android:src="@drawable/play"
             android:layout_gravity="center"
-            android:padding="5dp"
-            android:id="@+id/iv_trailer"/>
+            android:padding="@dimen/normal_padding"
+            android:id="@+id/iv_trailer"
+            android:contentDescription="@string/play_button"/>
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="5dp"
+            android:padding="@dimen/normal_padding"
             android:text="@string/trailer"
             android:id="@+id/tv_trailer_key"/>
     </LinearLayout>
